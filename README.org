@@ -1,0 +1,8 @@
+* Introduction
+- Basically a repository to store my notes on various programming languages.
+- Github now works pretty well with org files, so should be fine.
+
+* Languages Planned
+- [ ] : Rust
+- [ ] : Clojure
+- [ ] : Python
