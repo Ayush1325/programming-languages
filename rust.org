@@ -1,0 +1,1166 @@
+#+STARTUP: overview
+
+* Table Of Contents :toc:
+- [[#cargo][Cargo]]
+  - [[#new-project][New Project]]
+  - [[#initialize-project][Initialize Project]]
+  - [[#run][Run]]
+  - [[#build][Build]]
+  - [[#check-code-quality][Check Code Quality]]
+  - [[#update][Update]]
+  - [[#build-documentation][Build Documentation]]
+  - [[#install-binary-crate][Install Binary Crate]]
+  - [[#test][Test]]
+  - [[#cargotoml][Cargo.toml]]
+  - [[#workspaces][Workspaces]]
+- [[#comments][Comments]]
+  - [[#single-line][Single Line]]
+  - [[#documentation][Documentation]]
+- [[#data][Data]]
+  - [[#variables][Variables]]
+  - [[#references][References]]
+  - [[#constants][Constants]]
+  - [[#shadowing][Shadowing]]
+- [[#data-types--collections][Data Types & Collections]]
+  - [[#scalar-types][Scalar Types]]
+  - [[#compound-types][Compound Types]]
+  - [[#collections][Collections]]
+  - [[#struct][Struct]]
+  - [[#enum][Enum]]
+- [[#generics][Generics]]
+  - [[#function][Function]]
+  - [[#struct-1][Struct]]
+  - [[#enum-1][Enum]]
+- [[#control-flow][Control Flow]]
+  - [[#match][Match]]
+  - [[#if-else][If Else]]
+  - [[#if-let][If let]]
+  - [[#loop][Loop]]
+  - [[#for][For]]
+  - [[#while][While]]
+  - [[#while-let][While let]]
+  - [[#break][Break]]
+  - [[#continue][Continue]]
+- [[#functions][Functions]]
+  - [[#basic-syntax][Basic Syntax]]
+  - [[#result][Result]]
+  - [[#closures][Closures]]
+- [[#pointers][Pointers]]
+  - [[#basics][Basics]]
+  - [[#box][Box]]
+  - [[#rc][Rc]]
+  - [[#refcell][RefCell]]
+  - [[#creating-custom-smart-pointers][Creating custom smart pointers]]
+- [[#lifetimes][Lifetimes]]
+  - [[#lifetime-annotations][Lifetime annotations]]
+  - [[#static-lifetime][Static Lifetime]]
+- [[#ownership][Ownership]]
+  - [[#stack-vs-heap][Stack vs Heap]]
+  - [[#ownership-rules][Ownership Rules]]
+  - [[#move][Move]]
+  - [[#clone][Clone]]
+  - [[#references-1][References]]
+- [[#traits][Traits]]
+  - [[#intro][Intro]]
+  - [[#defining-trait][Defining Trait]]
+  - [[#implementing-trait][Implementing Trait]]
+  - [[#trait-in-function-parameters][Trait in function Parameters]]
+- [[#errors][Errors]]
+  - [[#recoverable-errors][Recoverable Errors]]
+  - [[#unrecoverable-errors][Unrecoverable Errors]]
+  - [[#error-propagation][Error Propagation]]
+- [[#testing][Testing]]
+  - [[#integration-tests][Integration Tests]]
+  - [[#unit-tests][Unit Tests]]
+  - [[#assert-macro][Assert Macro]]
+- [[#organization][Organization]]
+  - [[#packages][Packages]]
+  - [[#crates][Crates]]
+  - [[#modules][Modules]]
+  - [[#paths][Paths]]
+- [[#concurrency][Concurrency]]
+  - [[#threading][Threading]]
+  - [[#channels][Channels]]
+  - [[#sharing-data][Sharing Data]]
+  - [[#traits-for-concurrency][Traits for Concurrency]]
+- [[#console-operations][Console Operations]]
+  - [[#output][Output]]
+  - [[#input][Input]]
+  - [[#command-line-arguments][Command Line Arguments]]
+- [[#naming-convention][Naming Convention]]
+
+* Cargo
+** New Project
+*** Command
+#+begin_src shell
+  cargo new name
+#+end_src
+- By default builds binary crate.
+*** Flags
+- --lib : Create Library Crate
+** Initialize Project
+*** Command
+#+begin_src shell
+  cargo init
+#+end_src
+** Run
+*** Command
+#+begin_src shell
+  cargo run
+#+end_src
+*** Flags
+- -p name : Run a particular project
+** Build
+*** Command
+#+begin_src shell
+  cargo build
+#+end_src
+- Default builds debug
+*** Flags
+- --release
+** Check Code Quality
+*** Command
+#+begin_src shell
+  cargo check
+#+end_src
+** Update
+*** Command
+#+begin_src shell
+  cargo update
+#+end_src
+- Only updates to the same base release. Won't update to major releases. For that need to update cargo.toml
+** Build Documentation
+*** Command
+#+begin_src shell
+  cargo doc
+#+end_src
+*** Flags
+- --open : Open generated document after building.
+** Install Binary Crate
+*** Command
+#+begin_src shell
+  cargo install name
+#+end_src
+** Test
+*** Command
+#+begin_src shell
+  cargo test
+#+end_src
+- By default test run in multiple threads.
+- By default console output is not printed in tests.
+- To run selected test, we can specify the test name. Note that it runs all tests whose names match thetest name given like regular expressions.
+#+begin_src shell
+  cargo test name
+#+end_src
+*** Flags
+- *--test-threads=number* : To run tests in fixed number of threads.
+- *-p name crate_name* : Run a particular crate tests.
+- *--test integration_test* : Run integration tests.
+** Cargo.toml
+*** Example
+#+begin_src yaml
+  [package]
+  name = "temp"
+  version = "0.1.0"
+  authors = ["Ayush Singh <ayushsingh1325@gmail.com>"]
+  edition = "2018"
+
+  [dependencies]
+  add-one = { path = "../add-one" }
+
+  [workspace]
+  members = [
+      "adder",
+  ]
+#+end_src
+*** Headings
+**** Package
+Mainly contains package information like:
+- name
+- license
+- version
+- authors
+- edition
+- description
+**** Workspaces
+- members
+**** Dependencies
+**** Dev-dependensies
+** Workspaces
+Set of crates which share same cargo.lock and output directory.
+*** Create project with workspaces
+1. First add crate name in members under workspaces heading
+2. Use *cargo new* to create new crate.
+3. Other crates can be then added as dependecy in the cargo.toml of the main crate.
+
+* Comments
+** Single Line
+#+begin_src rust
+  // Something
+#+end_src
+** Documentation
+- Can use complete markdown
+- Used to generate documentation using cargo.
+*** For code that follows
+#+begin_src rust
+  ///Adds one to the number given.
+  /// # Examples
+  ///```
+  ///let arg = 5;
+  ///let answer = ///my_crate::add_one(arg);
+  ///assert_eq!(6, answer);
+  ///```
+  fn add_one(x: i32) -> i32 {
+      x + 1
+  }
+#+end_src
+- The code in these comments is run as tests.
+*** For Comments about crate
+#+begin_src rust
+  //! # My Crate
+  //!
+  //! `my_crate` is a collection of utilities to make performing certain
+  //! calculations more convenient.
+  /// Adds one to the number given.
+#+end_src
+- Used to add comment for the crate rather than a particular function in it.
+* Data
+** Variables
+*** Basic Defination
+**** Single assignment
+#+begin_src rust
+  let mut var = String::new();
+  let var = value;
+#+end_src
+**** Multiple Assignment
+- Using tuples
+#+begin_src rust
+  let (name, age) = ("Ayush", 18);
+#+end_src
+** References
+**** Immutable
+#+begin_src rust
+  &var;
+#+end_src
+**** Mutable
+#+begin_src rust
+  &mut var;
+#+end_src
+** Constants
+- Must be set to constant value, not an expression.
+- Must be annotated.
+#+begin_src rust
+  const c: i32 = 2;
+#+end_src
+** Shadowing
+#+begin_src rust
+  let x = 1;
+  let x = "cool";
+#+end_src
+- Not an error. The second initialization shadows the first.
+* Data Types & Collections
+** Scalar Types
+*** Integers
+- u<size> - Unsigned
+- i<size> - Signed
+- size = 8, 16, 32, 64, 128
+- usize - Pointer to unsigned integer.
+- isize - Pointer to signed integer.
+*** Floating Point Types
+- Only f32 and f64
+*** Boolean
+*** Character
+- Supports unicode, not just ASCII.
+- Represent single value.
+** Compound Types
+- Group of multiple values
+*** Tuple
+**** Defination
+#+begin_src rust
+  let tup: (i42, f64, u8)) = (500, 6.4, 1);
+  let (x, y, z) = tup;
+#+end_src
+**** Access Values
+#+begin_src rust
+  tup.0;
+#+end_src
+*** Array
+- Every element must have same type.
+- Fixed length.
+- Allocates in stack.
+**** Defination
+#+begin_src rust
+  let a = [1, 2, 3];
+  let a: [i32; 3] = [1, 2, 3];
+  let a = [3; 5];             // Creates [3, 3, 3, 3, 3]
+#+end_src
+**** Acess elements
+#+begin_src rust
+  a[0];
+  a[0..2];
+#+end_src
+** Collections
+*** Strings
+**** Types
+***** Primitive
+#+begin_src rust
+  let name = "Ayush";
+#+end_src
+- Also known as string splice.
+- Basically just array of str.
+***** Complex
+#+begin_src rust
+  let mut s = String::new();
+  let mut x = String::with_capacity(10);
+
+  let data = "initial contents".to_string();
+
+  let s = String::from("initial contents");
+
+  let s = format!("{}-{}-{}", s1, s2, s3);
+#+end_src
+- The to_string() is available for all types which implement Display trait.
+- *format!()* macro is useful to create complex strings.
+**** Methods
+***** Both
+- *parese()* : Converts to some other data type. Returns Result<T>
+- *len()*
+- *capacity()*
+- *isEmpty()*
+- *chars()* : Returns list of char. Can be used to iterate.
+- *bytes()* : Returns list of bytes. Can be used to iterate.
+- *contains("substring")*
+- *replace("word", "replacement")*
+- *split_whitespace()* : Returns list of words.
+- *trim()* : Remove white space at beginning or end.
+***** Only Complex
+- *push_str("test")*
+- *push('a')*
+**** Concatnation
+#+begin_src rust
+  let s1 = String::from("Hello, ");
+  let s2 = String::from("world!");
+  let s3 = s1 + &s2; // note s1 has been moved here and can no longer be
+  used
+#+end_src
+**** Acess Elements
+#+begin_src rust
+  let hello = "Здравствуйте";
+  let s = &hello[0..4];
+  let t = &hello[0];
+#+end_src
+*** Vectors
+**** Declaration
+#+begin_src rust
+  let v: Vec<i32> = Vec::new();
+  let v = vec![1, 2, 3];
+#+end_src
+**** Access elements
+#+begin_src rust
+  v[2];
+  v[0..2];
+
+  v.get(2);
+  v.get(0..2);
+#+end_src
+**** Methods
+- *push(item)*
+- *get(index)* - Returns Option<T>. Preferred.
+- *pop()*
+- *len()*
+**** Iterating
+#+begin_src rust
+  let mut v = vec![100, 32, 57];
+  for i in v.iter() {
+            println!("{}", i);
+  }
+#+end_src
+- Prefer using iterators.
+**** Storing multiple Data types
+- Using Enum
+#+begin_src rust
+  enum SpreadsheetCell {
+      Int(i32),
+      Float(f64),
+      Text(String),
+  }
+  let row = vec![
+      SpreadsheetCell::Int(3),
+      SpreadsheetCell::Text(String::from("blue")),
+      SpreadsheetCell::Float(10.12),
+  ];
+#+end_src
+*** HashMap
+**** Declaration
+#+begin_src rust
+  let mut scores = HashMap::new();
+
+  let teams = vec![String::from("Blue"), String::from("Yellow")];
+  let initial_scores = vec![10, 50];
+  let scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
+#+end_src
+- For types that implement the Copy trait, like i32 , the values are copied into the hash map. For owned values like String , the values will be moved and the hash map will be the owner of those values.
+**** Methods
+- *insert(key, value)* - Overwrites the key if it already exists.
+- *entry(key)* - Checks if key exists.
+- *or_insert(value)* - Chained with entry. Returns a mutable reference to the current value if key exists and will not insert.
+- *get(&key)* - Returns Option<T>.
+**** Iterating
+#+begin_src rust
+  for (key, value) in scores.iter() {
+      println!("{}: {}", key, value);
+  }
+#+end_src
+*** Iterators
+- They are lazy. Loaded when needed.
+**** Types
+- *iter()* : To iterate over immutable references.
+- *into_iter()* : To iterate with ownership.
+- *iter_mut()* : To iterate with mutable ownership.
+**** Methods
+- *next()*
+- *sum()*
+- *map(Consumer)* : Consumer form |T| -> T
+- *filter(Consumer)* : Consumer form |T| -> bool
+- *zip()*
+- *fold(Consumer)* : Consumer form |initval, T| -> newval
+** Struct
+*** Basic Declaration
+#+begin_src rust
+  struct Point {
+      x: i32,
+      y: i32
+  }
+
+  let p = Point { x: 0, y: 7 };
+  let q = Point {1, 2};
+  p.x;
+#+end_src
+*** Tuple Structs
+#+begin_src rust
+  struct User(String, u64);
+  let user = User {"Hello".to_string, 10};
+  user.0;
+#+end_src
+*** Debug trait
+#+begin_src rust
+  #[derive(Debug)]
+  struct User {}
+#+end_src
+- To print using debug trait.
+*** Implementing Structs
+#+begin_src rust
+  impl User {
+      fn id(&self) {
+          println!("{}", self.id)
+      }
+
+      fn set_name(&mut self, name: &str) {
+          self.name = name;
+      }
+
+      //Associated function
+      fn dummy(name: String, id: u64) -> User {
+          User {name, id}
+      }
+  }
+
+  user.id();
+  User::dummy("Test", 2);
+#+end_src
+** Enum
+*** Basic
+#+begin_src rust
+  enum IP {
+      V4,
+      V6,
+  }
+
+  struct V4 {}
+  struct V6 {}
+
+  let four = IP::V4;
+#+end_src
+- They can also be implemented like structs.
+*** Option
+#+begin_src rust
+  enum Option<T> {
+      Some(T),
+      None,
+  }
+
+  let absent_number: Option<i32> = None;
+#+end_src
+- It is built in
+*** Result
+#+begin_src rust
+  enum Result<T, K> {
+      Ok(T),
+      Err(K),
+  }
+#+end_src
+- Mostly used as return in functions
+* Generics
+** Function
+#+begin_src rust
+  fn largest<T>(list: &[T]) {}
+#+end_src
+** Struct
+#+begin_src rust
+  struct Point<T, U> {
+      x: T,
+      y: U,
+  }
+
+  impl<T, U> Point<T, U> {
+      fn x(&self) -> &T {
+          &self.x
+      }
+    
+      fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+          Point {
+              x: self.x,
+              y: other.y,
+          }
+      }
+  }
+#+end_src
+** Enum
+#+begin_src rust
+  enum Option<T> {
+      Some(T),
+      None,
+  }
+#+end_src
+* Control Flow
+** Match
+- *_* can be used like a default match.
+- Needs to handle every single possible match.
+*** Example
+#+begin_src rust
+  match var1.cmp(&var2) {
+      Ordering::Less => println!("Small"),
+      Ordering::Greater => println!("Big"),
+      Ordering::Equal => println!("Equal"),
+      _ => (),
+  }
+
+  let x = 1;
+  let y = 10;
+
+  match x {
+      1 | 2 => println!("One or Two"),
+      3..=5 => println!("Case 2"),
+      Some(n) if n == y => println!("Test"),
+      _ => (),
+  }
+
+  let p = Point { x: 0, y: 7 };
+  match p {
+      Point { x, y: 0 } => println!("On the x axis at {}", x),
+      Point { x: 0, y } => println!("On the y axis at {}", y),
+      //Ignore all varibles after x
+      Point { x, .. } => println!("On neither axis: ({})", x),
+  }
+
+  enum Message {
+      Hello { id: i32 },
+  }
+  let msg = Message::Hello { id: 5 };
+  match msg {
+      // @ binds value while checking condition.
+      Message::Hello { id: id_variable @ 3..=7 } => {
+          println!("Found an id in range: {}", id_variable)
+      },
+      Message::Hello { id: 10..=12 } => {
+          println!("Found an id in another range")
+      },
+      Message::Hello { id } => {
+          println!("Found some other id: {}", id)
+      },
+  }
+#+end_src
+** If Else
+*** Basic
+#+begin_src rust
+  if num < 5 {
+      //something
+  } else if num < 5 {
+      //other thing
+  } else {
+      //something
+  }
+#+end_src
+*** Can be used with let
+#+begin_src rust
+  let num = if condition {
+      4
+  } else {
+      5
+  };
+#+end_src
+** If let
+- Used when we need to handle only one match and ignore other
+
+#+begin_src rust
+  if let Some(3) = some_u8_value {
+      println!("three");
+  } else {
+      println!("Default");
+  }
+#+end_src
+** Loop
+- Creates an infinite loop
+#+begin_src rust
+  loop {
+      //Something
+  }
+#+end_src
+- Can also return from it
+#+begin_src rust
+  let res = loop {
+     break 1 + 2;
+  };
+#+end_src
+** For
+#+begin_src rust
+  for el in collection.iter() {
+      //Something
+  }
+
+  for el in 1..4 {
+      //Something
+  }
+#+end_src
+** While
+#+begin_src rust
+  while exp {
+      //Something
+  }
+#+end_src
+** While let
+- Kinda like if let.
+#+begin_src rust
+  let mut stack = Vec::new();
+  stack.push(1);
+  stack.push(2);
+  stack.push(3);
+  while let Some(top) = stack.pop() {
+     println!("{}", top);
+  }
+#+end_src
+** Break
+- To break out of a scope
+** Continue
+- Mostly used with loops
+* Functions
+** Basic Syntax
+#+begin_src rust
+  fn func(greet: &str) -> bool {
+      println!("{}", greet);
+      true    // Return value
+  }
+#+end_src
+- Execution starts from main function.
+- *!* - Means calling a macro rather than a normal function.
+- Use *snake_case* for naming.
+- There is no *;* with return values.
+- *return* keyword can still be used.
+** Result
+- A return type usually used in functions.
+#+begin_src rust
+  fn func() -> Result<i32, String> {
+      if true {
+          return Ok(3);
+      }
+      Err("Hello".to_string())
+  }
+
+  match func() {
+      Ok(num) => num,
+      Err(_) => continue,
+  };
+
+  func().except("Error");
+#+end_src
+** Closures
+- They are anoymous functions that can be stored in variables.
+- They can capture values from the scope in which they are defined.
+- We can annotate the types but it is not manadatory.
+*** Basic
+**** Without taking ownership of outer variable
+#+begin_src rust
+  let add = |n1: i32, n2: i32| n1 + n2;
+
+  let expensive_closure = |num: i32| {
+      println!("calculating slowly...");
+      thread::sleep(Duration::from_secs(2));
+      num
+  };
+#+end_src
+**** Taking ownership of outer variable
+#+begin_src rust
+  let x = 10;
+  let equal_to_x = move |z| z == x;
+#+end_src
+*** In structs
+#+begin_src rust
+  struct Cacher<T>
+      where T: Fn(u32) -> u32
+  {
+      calculation: T,
+      value: Option<u32>,
+  }
+#+end_src
+*** Function Traits
+- *FnOnce* consumes the variables it captures from its enclosing scope, known
+as the closure’s environment. To consume the captured variables, the closure
+must take ownership of these variables and move them into the closure
+when it is depned. The Once part of the name represents the fact that the
+closure can’t take ownership of the same variables more than once, so it can
+be called only once.
+- *FnMut* can change the environment because it mutably borrows values.
+- *Fn* borrows values from the environment immutably.
+* Pointers
+** Basics
+- They are datatypes which behave as pointers but can also own the data.
+- They allow having multiple owners of the same data.
+- They hava two traits *Drop* and *Deref*.
+** Box
+- Used to point to data on heap.
+- Don't have performance overhead.
+*** Uses
+- When you have a type whose size can’t be known at compile time and you want to use a value of that type in a context that requires an exact size.
+- When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so.
+- When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specifc type.
+*** Example
+#+begin_src rust
+  struct Element<T> {
+      val: T,
+      next: Box<Element<T>>,
+  }
+
+  Box::new("Hello");
+#+end_src
+** Rc
+- Used to enable multiple ownership. We can have multiple immutable references.
+- Should be used in single threaded apps.
+*** Types of references
+- *Strong* : value can be dropped only after strong reference count is 0.
+- *Weak* : value can be dropped even if weak reference count is not 0.
+** RefCell
+- Checks ownership rules at runtime rather than compile time.
+- Thus, can mutate vaule even if it's immutable.
+*** Uses
+- Can be used with Rc to have multiple mutable references.
+#+begin_src rust
+  Rc<RefCell<T>>
+#+end_src
+** Creating custom smart pointers
+- For mutable reference, implement the *Derefmut* trait.
+- *drop()* : cannot be called directly. It is only called after the pointer goes out of scope. Use *std::mem::drop(var)* to drop a smart pointer manually.
+#+begin_src rust
+  struct MyBox<T>(T);
+  impl<T> MyBox<T> {
+      fn new(x: T) -> MyBox<T> {
+          MyBox(x)
+      }
+  }
+
+  impl<T> Deref for MyBox<T> {
+      type Target = T;
+      fn deref(&self) -> &T {
+          &self.0
+      }
+  }
+
+  impl<T> Drop for MyBox<T> {
+      fn drop(&mut self) {
+          println!("Dropping CustomSmartPointer with data `{}`!", self.0);
+      }
+  }
+#+end_src
+* Lifetimes
+- It is basically the scope of a reference.
+** Lifetime annotations
+- To specify the life time of a refernece. It doesn't change the lifetime, just helps the compiler out.
+#+begin_src rust
+  fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+      if x.len() > y.len() {
+          x
+      } else {
+          y
+      }
+  }
+#+end_src
+** Static Lifetime
+- Exists throught the program run.
+#+begin_src rust
+  let s: &'static str = "I have a static lifetime.";
+#+end_src
+* Ownership
+** Stack vs Heap
+- Stack is faster than heap.
+- Ownership exists in rust to manage Heap data without a GC.
+** Ownership Rules
+- Each value in Rust has avariable that's called it's owner.
+- There can only be one owner at a time.
+- When the owner goes out of scope, the value is dropped.
+** Move
+- If two variables point to the same value in heap, the last one is the owner. All previous variables are rendered invalide and can't be used.
+- It also happends when variables are passed to function or returned from function.
+** Clone
+#+begin_src rust
+  let s2 = s1.clone();
+#+end_src
+- Creates a deep copy.
+** References
+- Allows to pass variables without moving, i.e without changing there ownership.
+- Only one mutable reference to a particular data is allowed in a scope.
+- We cannot have a both a mutable and immutable reference in the same scope. Or well, we can have them as long as the immutable references are not being used after the mutable reference has been created.
+- But we can have multiple immutable references in the same scope.
+*** Immutable refernece
+#+begin_src rust
+  cool(&s);
+
+  fn cool(s: &String) {
+      s.len();
+  }
+#+end_src
+*** Mutable reference
+#+begin_src rust
+  cool(&mut s);
+
+  fn cool(s: &mut String) {
+      s.len();
+  }
+#+end_src
+* Traits
+** Intro
+- They are similar to interfaces.
+- Not possible to call default implementation from ovverriding one.
+** Defining Trait
+#+begin_src rust
+  pub trait Summary {
+      fn summarize_author(&self) -> String;
+    
+      fn summarize(&self) -> String {
+          format!("(Read more from {}...)", self.summarize_author())
+      }
+  }
+#+end_src
+** Implementing Trait
+*** Using default methods
+#+begin_src rust
+  pub struct NewsArticle {
+      pub headline: String,
+      pub location: String,
+      pub author: String,
+      pub content: String,
+  }
+
+  impl Summary for NewsArticle {}
+#+end_src
+*** Ovverinding methods
+#+begin_src rust
+  pub struct Tweet {
+      pub username: String,
+      pub content: String,
+      pub reply: bool,
+      pub retweet: bool,
+  }
+
+  impl Summary for Tweet {
+      fn summarize(&self) -> String {
+          format!("{}: {}", self.username, self.content)
+      }
+  }
+#+end_src
+*** Implementing methods conditionally
+#+begin_src rust
+  struct Pair<T> {
+      x: T,
+      y: T,
+  }
+
+  impl<T> Pair<T> {
+      fn new(x: T, y: T) -> Self {
+          Self {
+              x,
+              y,
+          }
+      }
+  }
+
+  impl<T: Display + PartialOrd> Pair<T> {
+      fn cmp_display(&self) {
+          if self.x >= self.y {
+              println!("The largest member is x = {}", self.x);
+          } else {
+              println!("The largest member is y = {}", self.y);
+          }
+      }
+  }
+#+end_src
+** Trait in function Parameters
+#+begin_src rust
+  // Function for any item that implements Summary Trait.
+  pub fn notify(item: impl Summary) -> impl Summary {
+      println!("Breaking news! {}", item.summarize());
+  }
+
+  // Alternative
+  pub fn notify<T: Summary>(item: T) {
+      println!("Breaking news! {}", item.summarize());
+  }
+
+  // Multiple Traits
+  pub fn notify(item: impl Summary + Display) { }
+
+  // Alternative
+  pub fn notify<T: Summary + Display>(item: T) { }
+
+  // Alternative 2
+  fn some_function<T, U>(t: T, u: U) -> i32
+      where T: Display + Clone,
+      U: Clone + Debug
+  { }
+#+end_src
+- Traits of same type need to be returned though. For Example, we can't return both NewsArticle and Tweet from the same function.
+* Errors
+** Recoverable Errors
+- Result enum is used for this. It is built in.
+*** Ways to handle
+**** Match
+**** Unwrap
+- Calls panic!() on Err with error message
+#+begin_src rust
+  let f = File::open("hello.txt").unwrap();
+#+end_src
+**** Expect
+- Calls panic!() with custom error message
+#+begin_src rust
+  let f = File::open("hello.txt").expect("Failed to open hello.txt");
+#+end_src
+** Unrecoverable Errors
+*** COMMENT Cleaning Memory
+- Usually rust clears memory after panic before closing the program.
+- But the cleaning job can be left to the OS by using:
+#+begin_src yaml
+  [profile.release]
+  panic = 'abort'
+#+end_src
+*** Backtrace
+- We can run code with backtrace to get a list of all functions called till the point of error
+#+begin_src shell
+  RUST_BACKTRACE=1 cargo run
+#+end_src
+** Error Propagation
+#+begin_src rust
+  fn read_username_from_file() -> Result<String, io::Error> {
+      let mut f = File::open("hello.txt")?;
+      let mut s = String::new();
+      f.read_to_string(&mut s)?;
+      Ok(s)
+  }
+
+  fn read_username_from_file() -> Result<String, io::Error> {
+      let mut s = String::new();
+      File::open("hello.txt")?.read_to_string(&mut s)?;
+      Ok(s)
+  }
+#+end_src
+- *?* : Returns the error if error takes place at that statement.
+* Testing
+** Integration Tests
+- Can be created only in library crate.
+- They are external to our library. They use the library the same way other code would.
+- They go in the *tests* directory. It is a top level directory.
+- To share common funtions, use *tests/common/mod.rs*.
+** Unit Tests
+- Mostly test each unit of code in isolation. They are mostly put in the file with the code they are testing. By convention they are contained in a module named tests.
+- Docmentation Tests can also be used as unit tests.
+#+begin_src rust
+  #[cfg(test)]
+  mod tests {
+      #[test]
+      fn it_works() {
+          assert_eq!(2 + 2, 4);
+      }
+  }
+#+end_src 
+*** Macros
+- *[test]*
+- *[should_panic("Optional Error msg")]*
+- *[ignore]* : For long running tests.
+** Assert Macro
+If any arguments are passed after the default ones, they are printed in error messages.
+- *assert!(bool)*
+- *assert_eq!(val1, val2)*
+- *assert_ne!(val1, val2)*
+* Organization
+** Packages
+- A Cargo feature that lets you build, test, and share crates.
+- All items are private by default.
+** Crates
+- A tree of modules that produces a library or executable.
+*** Types
+- *Library* : Only zero or one in the package. Location: src/lib.rs
+- *Binary* : Multiple
+** Modules
+#+begin_src rust
+  mod front_of_house {
+      mod hosting {
+          fn add_to_waitlist() {}
+          fn seat_at_table() {}
+      }
+      mod serving {
+          fn take_order() {}
+          fn serve_order() {}
+          fn take_payment() {}
+      }
+  }
+#+end_src
+- Let you control the organization, scope, and privacy of paths.
+- Private siblings can call each other.
+** Paths
+- A way of naming an item, such as a struct, function, or module.
+*** Types
+**** Absolute
+- Starts from a crate root by using a crate name or a literal.
+#+begin_src rust
+  crate::front_of_house::hosting::add_to_waitlist();
+#+end_src
+**** Relative
+- Starts from the current module and uses self , super , or an identifer in the current module.
+- Super can be used to start the relative path from the current crate.
+#+begin_src rust
+
+  front_of_house::hosting::add_to_waitlist();
+#+end_src
+*** Use
+#+begin_src rust
+  use crate::front_of_house::hosting;
+  use crate::front_of_house::hosting as Test;
+  /// Import multiple things
+  use std::{cmp::Ordering, io}
+  /// Import all items
+  use std::*;
+
+  hosting::add_to_waitlist();
+#+end_src
+- Used to bring paths to a module.
+- *pub use* : Rexports the crate from this level. It can now be used as if it was defined here, even from another module.
+* Concurrency
+** Threading
+*** Create New
+#+begin_src rust
+  let handle = thread::spawn(|| {
+      for i in 1..10 {
+          println!("hi number {} from the spawned thread!", i);
+          thread::sleep(Duration::from_millis(1));
+      }
+  });
+#+end_src
+*** Ensure all threads run
+#+begin_src rust
+  handle.join().unwrap()
+#+end_src
+- Waits till all threads run.
+** Channels
+- It can have multiple sending ends but only one receiving end.
+*** Creation
+#+begin_src rust
+  let (tx, rx) = mpsc::channel();
+#+end_src
+*** Transmitter
+**** Sending Message
+#+begin_src rust
+  tx.send("Hi").unwrap();
+#+end_src
+**** Cloning transmitter
+#+begin_src rust
+  let tx1 = mpsc::Sender::clone(&tx);
+#+end_src
+*** Reciever
+- We can also use for loop for recieving. It is automatically broken when the channel is closed.
+**** Blocking
+#+begin_src rust
+  let received = rx.recv().unwrap();
+#+end_src
+**** Non Blocking
+#+begin_src rust
+  let received = rx.try_recv().unwrap();
+#+end_src
+- So it should be used with a loop as it returns response right away.
+** Sharing Data
+*** Mutex + Arc
+#+begin_src rust
+  fn main() {
+      let counter = Arc::new(Mutex::new(0));
+      let mut handles = vec![];
+      for _ in 0..10 {
+          let counter = Arc::clone(&counter);
+          let handle = thread::spawn(move || {
+              let mut num = counter.lock().unwrap();
+              ,*num += 1;
+          });
+          handles.push(handle);
+      }
+      for handle in handles {
+          handle.join().unwrap();
+      }
+      println!("Result: {}", *counter.lock().unwrap());
+  }
+#+end_src
+- Allows to access data one thread at a time. Has a lock system.
+- Mutexes offer interior mutability. That means that they are not completely safe to use just like RefCell<T>.
+** Traits for Concurrency
+***  Send
+- To send data between threads.
+- Almost all default types implement send trait except few like *Rc<T>*.
+- Any type composed entirely of *Send* types is automatically marked *Send* as well.
+*** Sync
+- It indicates that it is safe.
+- Like *Send*, any type composed entirely of *Sync* types is automatically marked *Sync* as well.
+* Console Operations
+** Output
+*** Standard Output
+**** Strings
+#+begin_src rust
+  println!("Hello World");
+
+  println!("Something {} is  {}", var1, var2);
+
+  println!("{0} is {1}. Hey {0}", "Rust", "cool");
+
+  println!("{name} likes to {activity}", name = "Brad", activity = "Baseball");
+
+  println!("Binary: {:b} Hex: {:x} Octal: {:o}", 10, 10, 10);
+#+end_src
+**** Debug Trait
+- For vector, hashmaps, tuples, etc.
+#+begin_src rust
+  println!("{:?}", (12, true));
+
+  // Pretty version
+  println!("{:#?}", vec![1, 2, 3]);
+#+end_src
+*** Standard Error
+#+begin_src rust
+  eprintln!("Msg");
+#+end_src
+** Input
+#+begin_src rust
+  io::stdin().read_line(&mut var).expect("Failed to read line");
+#+end_src
+- Returns Result<T, Err>
+** Command Line Arguments
+#+begin_src rust
+  let args = std::env::args().collect;
+#+end_src
+- Arguments passed with cargo run.
+* Naming Convention
+- *snake_case* : Functions, methods, crates, modules, local variables,
+- *CamelCase* : Traits, types, enum variants
+- *SCREAMING_SNAKE_CASE* : Static Variables, Constant Variables
