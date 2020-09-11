@@ -3,6 +3,6 @@
 - Github now works pretty well with org files, so should be fine.
 
 * Languages Planned
-- [ ] : Rust
+- [x] : Rust
 - [ ] : Clojure
 - [ ] : Python
